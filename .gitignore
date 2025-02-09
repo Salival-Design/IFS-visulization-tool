@@ -1,15 +1,18 @@
 # Dependencies
-node_modules/
-.pnp/
+/node_modules
+/.pnp
 .pnp.js
+.yarn/install-state.gz
 
 # Testing
-coverage/
+/coverage
+
+# Next.js
+/.next/
+/out/
 
 # Production
-dist/
-build/
-out/
+/build
 
 # Development
 .vscode/
@@ -23,15 +26,21 @@ yarn-debug.log*
 yarn-error.log*
 
 # Environment
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env*.local
 
 # OS
 .DS_Store
 Thumbs.db
 
 # Electron
-dist-electron/ 
+dist-electron/
+
+# Misc
+*.pem
+
+# Vercel
+.vercel
+
+# Typescript
+*.tsbuildinfo
+next-env.d.ts 

@@ -66,14 +66,24 @@ A feature-rich Electron application for visualizing the Internal Family Systems 
   - Zustand
   - React hooks
 
-## Getting Started
+## Development Setup for macOS
 
 ### Prerequisites
 
-- Node.js (v16 or higher)
-- npm (v7 or higher)
+1. Install Homebrew:
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
 
-### Installation
+2. Install Node.js and development tools:
+```bash
+brew install node
+xcode-select --install
+brew install git
+brew install --cask visual-studio-code
+```
+
+### Project Setup
 
 1. Clone the repository:
 ```bash
@@ -86,60 +96,40 @@ cd ifs-visualization-suite
 npm install
 ```
 
-3. Start the development server:
+### Development
+
+- Run in development mode:
 ```bash
-npm run dev
+npm run electron:dev
 ```
 
-### Building
-
-To create a production build:
+- Build for production:
 ```bash
-npm run build
+npm run electron:build
 ```
 
-To package the application:
+### Building for macOS Distribution
+
+1. Set up your Apple Developer credentials as environment variables:
 ```bash
-npm run package
+export APPLE_ID="your.apple.id@example.com"
+export APPLE_ID_PASSWORD="your-app-specific-password"
+export APPLE_TEAM_ID="your-team-id"
 ```
 
-## Usage
+2. Build the macOS app:
+```bash
+npm run electron:build:mac
+```
 
-### Clinical Controls Panel
+The packaged application will be available in the `release` directory.
 
-The application features a professional clinical control panel that allows therapists to:
+### Notes for macOS Distribution
 
-- Manage session information
-- Create and customize parts
-- Add custom images to parts
-- Track therapeutic progress
-- Create and manage relationships with health indicators
-- Add clinical annotations with categories
-- Monitor Self energy levels
-- Track system harmony
-
-The clinical panel can be toggled using the arrow button on the left side.
-
-### Visualization Controls
-
-- **Mouse Controls**
-  - Left Click: Select parts
-  - Right Click + Drag: Rotate camera (when unlocked)
-  - Scroll: Zoom in/out
-  - Mouse Over: View part details
-
-- **Camera Controls**
-  - Rotation Lock: Toggle camera rotation
-  - Orbit Controls: Smooth camera movement
-  - Zoom Limits: Configurable min/max distances
-  - Drag Lock: Automatically disables rotation while dragging parts
-
-### Timeline Controls
-- Create snapshots of the current state
-- Play/pause timeline playback
-- Adjust playback speed
-- Loop playback option
-- Minimize timeline panel
+- Ensure you have an Apple Developer account
+- Create an app-specific password for your Apple ID
+- The app will be automatically notarized if credentials are provided
+- The resulting .dmg file will be signed and ready for distribution
 
 ## License
 

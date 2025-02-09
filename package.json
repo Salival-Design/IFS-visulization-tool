@@ -1,84 +1,40 @@
 {
-  "name": "ifs-visualization-suite",
+  "name": "ifs-visualization-tool",
   "version": "1.0.0",
-  "description": "IFS Visualization Tool",
-  "main": "electron/main.js",
+  "description": "IFS Visualization Web Application",
+  "private": true,
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview",
-    "electron:dev": "concurrently \"npm run dev\" \"wait-on http://localhost:5175 && electron .\"",
-    "electron:build": "npm run build && electron-builder",
-    "electron:build:mac": "npm run build && electron-builder --mac",
-    "start": "electron ."
-  },
-  "build": {
-    "appId": "com.moodandmind.ifs-visualization",
-    "productName": "IFS Visualization Suite",
-    "copyright": "Copyright © 2024 The Mood & Mind Centre",
-    "afterSign": "electron/notarize.js",
-    "mac": {
-      "category": "public.app-category.medical",
-      "icon": "build/icon.icns",
-      "target": [
-        "dmg",
-        "zip"
-      ],
-      "darkModeSupport": true,
-      "hardenedRuntime": true,
-      "gatekeeperAssess": false,
-      "entitlements": "build/entitlements.mac.plist",
-      "entitlementsInherit": "build/entitlements.mac.plist",
-      "provisioningProfile": "build/embedded.provisionprofile",
-      "notarize": true
-    },
-    "dmg": {
-      "sign": true,
-      "contents": [
-        {
-          "x": 130,
-          "y": 220
-        },
-        {
-          "x": 410,
-          "y": 220,
-          "type": "link",
-          "path": "/Applications"
-        }
-      ],
-      "window": {
-        "width": 540,
-        "height": 400
-      }
-    },
-    "files": [
-      "dist/**/*",
-      "electron/**/*"
-    ],
-    "directories": {
-      "buildResources": "build",
-      "output": "release"
-    }
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
   "dependencies": {
+    "@radix-ui/react-collapsible": "^1.0.3",
+    "@radix-ui/react-dialog": "^1.0.5",
+    "@radix-ui/react-tabs": "^1.0.4",
     "@react-three/drei": "^9.99.0",
     "@react-three/fiber": "^8.15.16",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.0",
+    "next": "14.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "three": "^0.161.0"
+    "tailwind-merge": "^2.2.1",
+    "three": "^0.161.0",
+    "zustand": "^4.5.0"
   },
   "devDependencies": {
-    "@electron/notarize": "^2.5.0",
+    "@types/node": "^20.11.0",
     "@types/react": "^18.2.55",
     "@types/react-dom": "^18.2.19",
     "@types/three": "^0.161.2",
-    "@vitejs/plugin-react": "^4.2.1",
-    "concurrently": "^8.2.2",
-    "cross-env": "^7.0.3",
-    "electron": "^28.2.3",
-    "electron-builder": "^24.9.1",
-    "typescript": "^5.3.3",
-    "vite": "^5.1.1",
-    "wait-on": "^7.2.0"
+    "autoprefixer": "^10.4.17",
+    "eslint": "^8.56.0",
+    "eslint-config-next": "^14.1.0",
+    "postcss": "^8.4.35",
+    "tailwindcss": "^3.4.1",
+    "tailwindcss-animate": "^1.0.7",
+    "typescript": "^5.3.3"
   }
 }
