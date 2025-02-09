@@ -144,7 +144,7 @@ The clinical panel can be toggled using the arrow button on the left side.
 
 ## License
 
-© 2024 The Mood & Mind Centre. All rights reserved.
+© 2025 The Mood & Mind Centre. All rights reserved.
 
 ## Contact
 
