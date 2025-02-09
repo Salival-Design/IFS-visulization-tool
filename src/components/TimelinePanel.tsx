@@ -1,7 +1,9 @@
+'use client'
+
 import React, { useState, useEffect, useCallback } from 'react';
-import { IFSModel, SessionSnapshot, SessionTimeline, TimelineControls } from '../types/IFSModel';
+import { IFSModel, SessionSnapshot, SessionTimeline, TimelineControls } from '@/types/IFSModel';
 import { ClinicalSettings } from './ClinicalPanel';
-import { saveSession, loadSession, getSessions, deleteSession, exportSession, importSession } from '../utils/sessionStorage';
+import { saveSession, loadSession, getSessions, deleteSession, exportSession, importSession } from '@/utils/sessionStorage';
 
 interface TimelinePanelProps {
   model: IFSModel;
@@ -34,19 +36,19 @@ const TimelinePanel: React.FC<TimelinePanelProps> = ({
   const [availableSessions, setAvailableSessions] = useState<string[]>([]);
 
   useEffect(() => {
-    // Load available sessions
-    const sessions = getSessions();
-    setAvailableSessions(sessions);
+    if (typeof window !== 'undefined') {
+      const sessions = getSessions();
+      setAvailableSessions(sessions);
 
-    // Load the last session if available
-    if (sessions.length > 0) {
-      const lastSession = loadSession(sessions[sessions.length - 1]);
-      if (lastSession) {
-        setTimeline(lastSession);
-        if (lastSession.snapshots.length > 0 && lastSession.currentSnapshotIndex >= 0) {
-          const snapshot = lastSession.snapshots[lastSession.currentSnapshotIndex];
-          onUpdateModel(snapshot.model);
-          onUpdateSettings(snapshot.clinicalSettings);
+      if (sessions.length > 0) {
+        const lastSession = loadSession(sessions[sessions.length - 1]);
+        if (lastSession) {
+          setTimeline(lastSession);
+          if (lastSession.snapshots.length > 0 && lastSession.currentSnapshotIndex >= 0) {
+            const snapshot = lastSession.snapshots[lastSession.currentSnapshotIndex];
+            onUpdateModel(snapshot.model);
+            onUpdateSettings(snapshot.clinicalSettings);
+          }
         }
       }
     }

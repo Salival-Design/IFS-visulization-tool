@@ -10,9 +10,20 @@ export interface Part {
     z: number;
   };
   emotionalLoad: number;
+  relationships: Relationship[];
+  notes: string;
+  image?: string;
+  color?: string;
   imageUrl?: string;
   showLabels: boolean;
   brightness: number; // 0-1: Controls the image brightness
+}
+
+export interface Relationship {
+  targetId: string;
+  type: 'alliance' | 'conflict' | 'protection' | 'polarization';
+  strength: number;
+  notes?: string;
 }
 
 export interface IFSModel {
@@ -21,6 +32,9 @@ export interface IFSModel {
     presence: number;
     position: { x: number; y: number; z: number };
   };
+  selfEnergy: number;
+  systemHarmony: number;
+  notes: string[];
 }
 
 export interface SessionSnapshot {
