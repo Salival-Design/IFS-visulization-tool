@@ -5,9 +5,11 @@ import { IFSModel } from '../lib/ifs-model'
 import { Points, Mesh } from 'three'
 import { useSpring, animated } from '@react-spring/three'
 import { Html, Sparkles } from '@react-three/drei'
+import { VisualizationSettings } from './ControlPanel'
 
 interface IFSVisualizationProps {
   model: IFSModel;
+  settings: VisualizationSettings;
 }
 
 const CORE_RADIUS = 0.8
@@ -21,7 +23,7 @@ const partColors = {
   exile: '#9b59b6',      // Deep purple
 }
 
-const PartParticle = ({ part, onClick }: { part: any, onClick: () => void }) => {
+const PartParticle = ({ part, settings, onClick }: { part: any, settings: VisualizationSettings, onClick: () => void }) => {
   const [hovered, setHovered] = useState(false)
   const meshRef = useRef<THREE.Mesh>(null)
 
@@ -46,7 +48,7 @@ const PartParticle = ({ part, onClick }: { part: any, onClick: () => void }) => 
       onPointerOver={() => setHovered(true)}
       onPointerOut={() => setHovered(false)}
     >
-      <sphereGeometry args={[PART_SCALE, 32, 32]} />
+      <sphereGeometry args={[settings.partSize, 32, 32]} />
       <meshPhysicalMaterial
         color={partColors[part.type as keyof typeof partColors]}
         roughness={0.2}
@@ -56,7 +58,7 @@ const PartParticle = ({ part, onClick }: { part: any, onClick: () => void }) => 
         emissive={partColors[part.type as keyof typeof partColors]}
         emissiveIntensity={hovered ? 0.5 : 0.2}
       />
-      {hovered && (
+      {settings.showLabels && hovered && (
         <Html distanceFactor={15}>
           <div className="part-label" style={{
             background: 'rgba(0,0,0,0.8)',
@@ -72,27 +74,29 @@ const PartParticle = ({ part, onClick }: { part: any, onClick: () => void }) => 
           </div>
         </Html>
       )}
-      <Sparkles
-        count={20}
-        scale={0.4}
-        size={2}
-        speed={0.2}
-        opacity={0.3}
-        color={partColors[part.type as keyof typeof partColors]}
-      />
+      {settings.showSparkles && (
+        <Sparkles
+          count={20}
+          scale={0.4}
+          size={2}
+          speed={0.2}
+          opacity={0.3}
+          color={partColors[part.type as keyof typeof partColors]}
+        />
+      )}
     </animated.mesh>
   )
 }
 
-export default function IFSVisualization({ model }: IFSVisualizationProps) {
+export default function IFSVisualization({ model, settings }: IFSVisualizationProps) {
   const particles = useRef<Points>(null)
   const selfRef = useRef<Mesh>(null)
   const [selectedPart, setSelectedPart] = useState<string | null>(null)
 
   // Background particle system
   const positions = useMemo(() => {
-    const arr = new Float32Array(PARTICLE_COUNT * 3)
-    for (let i = 0; i < PARTICLE_COUNT; i++) {
+    const arr = new Float32Array(settings.particleDensity * 3)
+    for (let i = 0; i < settings.particleDensity; i++) {
       const radius = 5 + Math.random() * 5
       const theta = Math.random() * Math.PI * 2
       const phi = Math.random() * Math.PI
@@ -101,17 +105,17 @@ export default function IFSVisualization({ model }: IFSVisualizationProps) {
       arr[i * 3 + 2] = radius * Math.cos(phi)
     }
     return arr
-  }, [])
+  }, [settings.particleDensity])
 
   useFrame((state) => {
     if (!selfRef.current || !particles.current) return
 
     // Rotate self nucleus gently
-    selfRef.current.rotation.y += 0.001
+    selfRef.current.rotation.y += settings.rotationSpeed
     
     // Animate background particles
     const positions = particles.current.geometry.attributes.position.array as Float32Array
-    for (let i = 0; i < PARTICLE_COUNT; i++) {
+    for (let i = 0; i < settings.particleDensity; i++) {
       const i3 = i * 3
       positions[i3] += Math.sin(state.clock.elapsedTime * 0.1 + i) * 0.001
       positions[i3 + 1] += Math.cos(state.clock.elapsedTime * 0.1 + i) * 0.001
@@ -127,7 +131,7 @@ export default function IFSVisualization({ model }: IFSVisualizationProps) {
         <bufferGeometry>
           <bufferAttribute
             attach="attributes-position"
-            count={PARTICLE_COUNT}
+            count={settings.particleDensity}
             itemSize={3}
             array={positions}
           />
@@ -143,7 +147,7 @@ export default function IFSVisualization({ model }: IFSVisualizationProps) {
 
       {/* Core Self Nucleus */}
       <mesh ref={selfRef} position={[0, 0, 0]}>
-        <sphereGeometry args={[CORE_RADIUS, 64, 64]} />
+        <sphereGeometry args={[settings.selfSize, 64, 64]} />
         <meshPhysicalMaterial
           color="#ffd700"
           emissive="#ffaa00"
@@ -153,14 +157,16 @@ export default function IFSVisualization({ model }: IFSVisualizationProps) {
           transparent
           opacity={0.9}
         />
-        <Sparkles
-          count={30}
-          scale={1}
-          size={4}
-          speed={0.2}
-          opacity={0.5}
-          color="#ffaa00"
-        />
+        {settings.showSparkles && (
+          <Sparkles
+            count={30}
+            scale={1}
+            size={4}
+            speed={0.2}
+            opacity={0.5}
+            color="#ffaa00"
+          />
+        )}
       </mesh>
 
       {/* Part Visualization */}
@@ -168,6 +174,7 @@ export default function IFSVisualization({ model }: IFSVisualizationProps) {
         <PartParticle
           key={part.id}
           part={part}
+          settings={settings}
           onClick={() => setSelectedPart(part.id)}
         />
       ))}

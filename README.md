@@ -4,20 +4,40 @@ A feature-rich Electron application for visualizing the Internal Family Systems 
 
 ## Features
 
-- 3D visualization of IFS parts and relationships
-- Interactive particle system for parts representation
-- Dynamic Self nucleus visualization
-- Real-time part interaction and movement
-- Orbital camera controls for immersive exploration
+- **3D Visualization**
+  - Interactive particle system for parts representation
+  - Dynamic Self nucleus visualization
+  - Real-time part interaction and movement
+  - Orbital camera controls for immersive exploration
+
+- **Professional Control Panel**
+  - Real-time visualization settings adjustment
+  - Part management and positioning
+  - Dynamic emotional load control
+  - Visual effects customization
+  - Camera and environment controls
+
+- **Therapeutic Tools**
+  - Part type differentiation (managers, firefighters, exiles)
+  - Emotional load visualization
+  - Interactive part relationships
+  - Session state management
 
 ## Tech Stack
 
-- Electron
-- React
-- TypeScript
-- Three.js
-- React Three Fiber
-- Vite
+- **Frontend**
+  - React
+  - TypeScript
+  - Three.js
+  - React Three Fiber
+  - React Spring
+
+- **Desktop**
+  - Electron
+  - Vite
+
+- **State Management**
+  - Zustand
 
 ## Getting Started
 
@@ -56,6 +76,32 @@ To package the application:
 npm run package
 ```
 
+## Usage
+
+### Control Panel
+
+The application features a professional control panel that allows therapists to:
+
+- Adjust visualization settings in real-time
+- Manage and position parts
+- Control emotional load values
+- Customize visual effects
+- Adjust camera and environment settings
+
+The control panel can be toggled using the arrow button on the left side.
+
+### Visualization Controls
+
+- **Mouse Controls**
+  - Left Click: Select parts
+  - Right Click + Drag: Rotate camera
+  - Scroll: Zoom in/out
+
+- **Part Interaction**
+  - Hover: View part details
+  - Click: Select part for editing
+  - Drag: Reposition part (coming soon)
+
 ## Development
 
 The project uses:
@@ -64,6 +110,20 @@ The project uses:
 - Three.js for 3D visualization
 - Electron for desktop application functionality
 - Vite for fast development and building
+
+### Project Structure
+
+```
+src/
+  ├── components/
+  │   ├── ControlPanel.tsx    # Professional control panel
+  │   ├── IFSVisualization.tsx # Main 3D visualization
+  │   └── ErrorBoundary.tsx   # Error handling
+  ├── lib/
+  │   └── ifs-model.ts        # IFS data models
+  ├── App.tsx                 # Main application
+  └── main.tsx               # Entry point
+```
 
 ## License
 
