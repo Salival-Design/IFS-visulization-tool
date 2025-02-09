@@ -4,13 +4,18 @@ import path from 'path';
 
 export default defineConfig({
   plugins: [react()],
-  base: process.env.NODE_ENV === 'development' ? '/' : './',
+  base: './',
   build: {
     outDir: 'dist',
     emptyOutDir: true,
+    sourcemap: true,
+    assetsDir: '.',
     rollupOptions: {
       input: {
         main: path.resolve(__dirname, 'index.html')
+      },
+      output: {
+        manualChunks: undefined
       }
     }
   },

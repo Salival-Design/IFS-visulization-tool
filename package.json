@@ -3,11 +3,12 @@
   "version": "1.0.0",
   "main": "main.js",
   "scripts": {
-    "start": "electron .",
     "dev": "cross-env NODE_ENV=development concurrently \"vite\" \"wait-on http://localhost:5174 && electron .\"",
     "build": "vite build",
     "preview": "vite preview",
-    "package": "npm run build && electron-builder"
+    "start": "cross-env NODE_ENV=production electron .",
+    "package": "npm run build && electron-builder",
+    "postinstall": "electron-builder install-app-deps"
   },
   "dependencies": {
     "@react-spring/three": "^9.7.5",
@@ -29,5 +30,25 @@
   "devDependencies": {
     "@types/three": "^0.173.0",
     "wait-on": "^8.0.2"
+  },
+  "build": {
+    "appId": "com.ifs-visualization-suite",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "main.js",
+      "preload.js"
+    ],
+    "win": {
+      "target": "nsis"
+    },
+    "mac": {
+      "target": "dmg"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
   }
 }

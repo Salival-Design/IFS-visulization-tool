@@ -12,7 +12,8 @@ export interface Part {
     targetId: string;
     type: 'polarized' | 'allied' | 'protective';
   }[];
-  imageUrl?: string;
+  imageUrl: string;
+  showLabels: boolean;
 }
 
 export interface IFSModel {

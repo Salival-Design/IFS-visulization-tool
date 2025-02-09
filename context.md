@@ -2,79 +2,96 @@
 
 ## Overview
 
-This project aims to develop a feature-rich Electron application for visualizing the Internal Family Systems (IFS) therapeutic model. The application will be optimized for clinical use, providing a 3D interactive environment for therapists and clients to explore and understand the client's internal system.
+This project aims to develop a feature-rich Electron application for visualizing the Internal Family Systems (IFS) therapeutic model. The application provides a professional-grade 3D interactive environment for therapists and clients to explore and understand the client's internal system, with a focus on clinical utility and user experience.
 
 ## Core Features
 
 1.  **IFS-Centric Visualization Engine:**
-    *   Procedurally generated 3D systems using WebGL/Three.js.
-    *   Dynamic representation of "Self" as a radiant nucleus.
-    *   Interactive particle systems for protector parts (managers/firefighters) and exiled parts.
-    *   Custom image textures for personalized part representation.
-    *   Visualization of part relationships, conflicts, and emotional load through:
-        *   Depth-aware node hierarchies.
-        *   Real-time particle density and color gradients.
-        *   Tension lines and force fields for polarization.
-        *   Animations for healing progress (harmonization, luminosity).
+    *   Advanced 3D visualization using WebGL/Three.js
+    *   Dynamic "Self" nucleus with energy level indicators
+    *   Interactive particle systems for parts (managers/firefighters/exiles)
+    *   Custom image textures with fallback color coding
+    *   Enhanced relationship visualization system:
+        *   Health status indicators with color coding
+        *   Dynamic strength-based line thickness
+        *   Customizable relationship types and colors
+        *   Improved positioning and scaling
+        *   Smooth animated transitions
+        *   Polarization effect for conflicting relationships
 
-2.  **Clinical Interaction Suite:**
-    *   Role-based interfaces (therapist and client views).
+2.  **Professional Clinical Interface:**
+    *   Optimized dual-panel system:
+        *   Clinical Controls (left side)
+        *   Visual Settings (right side)
+        *   Improved tab navigation
+        *   Enhanced spacing and layout
     *   Multi-layered annotation system:
-        *   Session timeline tagging.
-        *   Emotional valence heatmaps.
-        *   Alliance strength indicators.
-    *   Guided IFS protocol integration (direct access vs. witness mode).
-    *   Professional Clinical Control Panel:
-        *   Session management and tracking.
-        *   Part creation and customization.
-        *   Custom image upload support.
-        *   Relationship mapping.
-        *   Clinical annotations.
-        *   Progress tracking.
+        *   Categorized annotations (insight/observation/intervention/homework)
+        *   Position-based or part-attached notes
+        *   Session timeline tracking
+        *   Progress indicators
+    *   Comprehensive relationship management:
+        *   Multiple relationship types with visual indicators
+        *   Enhanced health status tracking
+        *   Dynamic strength indicators
+        *   Color-coded relationships
+        *   Detailed clinical notes per relationship
 
-3.  **Dynamic Symbolism Toolkit:**
-    *   Customizable visual representations:
-        *   Part size and appearance.
-        *   Custom image textures.
-        *   Emotional load visualization.
-        *   Relationship indicators.
-        *   Environmental effects.
-    *   Interactive feedback system:
-        *   Real-time part state updates.
-        *   Visual response to therapeutic interventions.
-        *   Session progress tracking.
+3.  **Enhanced User Experience:**
+    *   Responsive collapsible control panels
+    *   Smooth transitions and animations
+    *   Intuitive part management
+    *   Real-time visual feedback
+    *   Optimized controls
+    *   Clear visual hierarchy
+    *   Professional styling
+    *   Improved tab navigation
 
 ## Technologies
 
-*   **Electron:** For building the desktop application.
-*   **React:** For UI development and component management.
-*   **TypeScript:** For type safety and better development experience.
-*   **Three.js/React Three Fiber:** For 3D graphics and rendering.
-*   **React Spring:** For smooth animations and transitions.
-*   **Zustand:** For state management.
+*   **Core Framework:**
+    *   Electron for cross-platform desktop support
+    *   React 18 for modern UI development
+    *   TypeScript 5 for type safety
+    *   Vite for fast development
+
+*   **3D Visualization:**
+    *   Three.js for 3D rendering
+    *   React Three Fiber for React integration
+    *   React Spring for animations
+    *   Custom shaders and effects
+
+*   **State Management:**
+    *   Zustand for global state
+    *   React hooks for local state
+    *   TypeScript for type definitions
 
 ## Current Status
 
 ### Completed Features
-* Initial project setup complete
-* Basic 3D visualization implemented
-* Core IFS model structure defined
-* Professional clinical panel implemented
-* Part management system with custom images
-* Real-time visualization settings management
-* Session tracking and management
-* Relationship visualization between parts
+* Full project infrastructure
+* Professional dual-panel interface
+* Advanced 3D visualization system
+* Comprehensive part management
+* Enhanced relationship visualization
 * Clinical annotation system
+* Session tracking
+* Real-time updates
+* Smooth animations
+* Security hardening (CSP)
+* Improved relationship effects
+* Enhanced clinical tools
 
 ### In Progress
-* Enhanced relationship visualization
-* Session recording and playback
-* Guided protocol integration
-* Data persistence and session management
+* Data persistence
+* Session recording
+* Export capabilities
+* Advanced relationship analytics
 
 ### Planned Features
-* Client profile management
-* Session history tracking
-* Export and reporting tools
-* Advanced visualization effects
-* Collaborative session support
+* Client profiles
+* Session history
+* Advanced reporting
+* Collaboration tools
+* Data analytics
+* Guided protocols

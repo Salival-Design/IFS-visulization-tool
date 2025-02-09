@@ -1,12 +1,14 @@
 import { useFrame } from '@react-three/fiber'
 import { useMemo, useRef, useState, useEffect } from 'react'
 import * as THREE from 'three'
-import { IFSModel } from '../lib/ifs-model'
-import { Points, Mesh, Line } from 'three'
-import { useSpring, animated } from '@react-spring/three'
-import { Html, Sparkles, Line as DreiLine } from '@react-three/drei'
+import { IFSModel, Part } from '../lib/ifs-model'
+import { Points, Mesh } from 'three'
+import { useSpring } from '@react-spring/three'
+import { Html, Sparkles, Line } from '@react-three/drei'
 import { VisualizationSettings } from './ControlPanel'
 import { ClinicalSettings } from './ClinicalPanel'
+import { partColors } from '../types/IFSModel'
+import { ThreeEvent } from '@react-three/fiber'
 
 interface IFSVisualizationProps {
   model: IFSModel;
@@ -18,125 +20,114 @@ const CORE_RADIUS = 0.8
 const PARTICLE_COUNT = 1000 // Background particles
 const PART_SCALE = 0.3
 
-// Color schemes for different part types
-const partColors = {
-  manager: '#4a90e2',    // Calming blue
-  firefighter: '#e25c45', // Energetic red
-  exile: '#9b59b6',      // Deep purple
-}
-
-const PartParticle = ({ part, settings, onClick }: { part: any, settings: VisualizationSettings, onClick: () => void }) => {
-  const [hovered, setHovered] = useState(false);
-  const meshRef = useRef<THREE.Mesh>(null);
-  const textureLoader = new THREE.TextureLoader();
+const PartMesh: React.FC<{
+  part: Part;
+  settings: VisualizationSettings;
+  isHovered: boolean;
+  onClick: () => void;
+  onPointerOver: () => void;
+  onPointerOut: () => void;
+}> = ({ part, settings, isHovered, onClick, onPointerOver, onPointerOut }) => {
   const [texture, setTexture] = useState<THREE.Texture | null>(null);
+  const textureLoader = useMemo(() => new THREE.TextureLoader(), []);
+  const materialRef = useRef<THREE.MeshStandardMaterial>(null);
 
   useEffect(() => {
     if (part.imageUrl) {
-      textureLoader.load(part.imageUrl, (loadedTexture) => {
-        setTexture(loadedTexture);
-      });
+      textureLoader.loadAsync(part.imageUrl)
+        .then(loadedTexture => {
+          setTexture(loadedTexture);
+        })
+        .catch(error => {
+          console.error('Error loading texture:', error);
+          setTexture(null);
+        });
+    } else {
+      setTexture(null);
     }
-  }, [part.imageUrl]);
+  }, [part.imageUrl, textureLoader]);
 
-  // Animate on hover
-  const { scale } = useSpring({
-    scale: hovered ? 1.2 : 1,
-    config: { tension: 300, friction: 10 }
-  })
+  const scale = settings.partSize * (1 + (part.emotionalLoad * 0.5));
+  const hoverScale = isHovered ? 1.2 : 1;
 
-  useFrame((state) => {
-    if (!meshRef.current) return;
-    // Gentle floating motion
-    meshRef.current.position.y += Math.sin(state.clock.elapsedTime + part.id.length) * 0.0005;
-  });
+  useEffect(() => {
+    if (materialRef.current) {
+      materialRef.current.color = new THREE.Color(texture ? 'white' : partColors[part.type]);
+      materialRef.current.map = texture;
+      materialRef.current.emissive = new THREE.Color(texture ? 'white' : partColors[part.type]);
+      materialRef.current.emissiveIntensity = isHovered ? 0.5 : 0.2;
+      materialRef.current.transparent = true;
+      materialRef.current.opacity = 0.9;
+      materialRef.current.needsUpdate = true;
+    }
+  }, [texture, part.type, isHovered]);
 
   return (
-    <animated.mesh
-      ref={meshRef}
-      position={[part.position.x * 2, part.position.y * 2, part.position.z * 2]}
-      scale={scale}
+    <group
+      position={[part.position.x, part.position.y, part.position.z]}
+      scale={[scale * hoverScale, scale * hoverScale, scale * hoverScale]}
       onClick={onClick}
-      onPointerOver={() => setHovered(true)}
-      onPointerOut={() => setHovered(false)}
+      onPointerOver={onPointerOver}
+      onPointerOut={onPointerOut}
     >
-      <sphereGeometry args={[settings.partSize, 32, 32]} />
-      {texture ? (
-        <meshPhysicalMaterial
-          map={texture}
-          roughness={0.2}
-          metalness={0.8}
-          transparent
-          opacity={0.8}
-          emissiveMap={texture}
-          emissiveIntensity={hovered ? 0.5 : 0.2}
-        />
-      ) : (
-        <meshPhysicalMaterial
-          color={partColors[part.type as keyof typeof partColors]}
-          roughness={0.2}
-          metalness={0.8}
-          transparent
-          opacity={0.8}
-          emissive={partColors[part.type as keyof typeof partColors]}
-          emissiveIntensity={hovered ? 0.5 : 0.2}
-        />
-      )}
-      {settings.showLabels && hovered && (
-        <Html distanceFactor={15}>
-          <div className="part-label" style={{
-            background: 'rgba(0,0,0,0.8)',
-            padding: '8px 12px',
+      <mesh>
+        <sphereGeometry args={[0.5, 32, 32]} />
+        <meshStandardMaterial ref={materialRef} />
+      </mesh>
+      {settings.showLabels && part.showLabels && (
+        <Html
+          position={[0, 0.8, 0]}
+          center
+          style={{
+            backgroundColor: 'rgba(0,0,0,0.8)',
+            padding: '4px 8px',
             borderRadius: '4px',
             color: 'white',
             fontSize: '14px',
-            whiteSpace: 'nowrap'
-          }}>
-            <strong>{part.name}</strong>
-            <br />
-            Load: {(part.emotionalLoad * 100).toFixed(0)}%
-          </div>
+            whiteSpace: 'nowrap',
+            pointerEvents: 'none',
+            userSelect: 'none'
+          }}
+        >
+          {part.name}
         </Html>
       )}
-      {settings.showSparkles && (
-        <Sparkles
-          count={30}
-          scale={0.4}
-          size={2}
-          speed={0.2}
-          opacity={0.3}
-          color={partColors[part.type as keyof typeof partColors]}
-        />
-      )}
-    </animated.mesh>
+    </group>
   );
-}
+};
 
-// Helper component for relationship lines
-const RelationshipLine = ({ start, end, type, strength }: { 
+// Helper function for relationship line colors
+const lineColor = (type: string) => {
+  switch(type) {
+    case 'polarization': return '#ff4444';
+    case 'alliance': return '#44ff44';
+    case 'protection': return '#4444ff';
+    case 'burden': return '#ff8844';
+    default: return '#ffffff';
+  }
+};
+
+// Update the RelationshipLine component
+const RelationshipLine = ({ start, end, type, strength, color }: { 
   start: THREE.Vector3, 
   end: THREE.Vector3, 
   type: string,
-  strength: number 
+  strength: number,
+  color: string 
 }) => {
-  const lineColor = useMemo(() => {
-    switch(type) {
-      case 'polarization': return '#ff4444';
-      case 'alliance': return '#44ff44';
-      case 'protection': return '#4444ff';
-      case 'burden': return '#ff8844';
-      default: return '#ffffff';
-    }
-  }, [type]);
-
   const points = useMemo(() => [start, end], [start, end]);
 
   return (
-    <DreiLine
+    <Line
       points={points}
-      color={lineColor}
-      lineWidth={strength * 5}
+      color={color}
+      lineWidth={strength * 3}
       dashed={type === 'polarization'}
+      dashScale={type === 'polarization' ? 0.5 : 1}
+      dashSize={type === 'polarization' ? 0.4 : 1}
+      gapSize={type === 'polarization' ? 0.2 : 0}
+      transparent
+      opacity={0.8}
     />
   );
 };
@@ -188,7 +179,8 @@ const Annotation = ({ text, position, type }: {
   );
 };
 
-export default function IFSVisualization({ model, settings, clinicalSettings }: IFSVisualizationProps) {
+// Move all Three.js specific components into a Scene component
+const Scene: React.FC<IFSVisualizationProps> = ({ model, settings, clinicalSettings }) => {
   const particles = useRef<Points>(null)
   const selfRef = useRef<Mesh>(null)
   const [selectedPart, setSelectedPart] = useState<string | null>(null)
@@ -227,21 +219,22 @@ export default function IFSVisualization({ model, settings, clinicalSettings }: 
       if (!sourcePart || !targetPart) return null;
 
       const start = new THREE.Vector3(
-        sourcePart.position.x * 2,
-        sourcePart.position.y * 2,
-        sourcePart.position.z * 2
+        sourcePart.position.x,
+        sourcePart.position.y,
+        sourcePart.position.z
       );
       const end = new THREE.Vector3(
-        targetPart.position.x * 2,
-        targetPart.position.y * 2,
-        targetPart.position.z * 2
+        targetPart.position.x,
+        targetPart.position.y,
+        targetPart.position.z
       );
 
       return {
         start,
         end,
         type: rel.type,
-        strength: rel.strength
+        strength: rel.strength,
+        color: rel.color || lineColor(rel.type)
       };
     }).filter(Boolean);
   }, [model.parts, clinicalSettings?.relationships]);
@@ -341,16 +334,20 @@ export default function IFSVisualization({ model, settings, clinicalSettings }: 
           end={line.end}
           type={line.type}
           strength={line.strength}
+          color={line.color}
         />
       ))}
 
       {/* Part Visualization */}
       {model.parts.map((part) => (
-        <PartParticle
+        <PartMesh
           key={part.id}
           part={part}
           settings={settings}
+          isHovered={selectedPart === part.id}
           onClick={() => setSelectedPart(part.id)}
+          onPointerOver={() => setSelectedPart(part.id)}
+          onPointerOut={() => setSelectedPart(null)}
         />
       ))}
 
@@ -365,4 +362,9 @@ export default function IFSVisualization({ model, settings, clinicalSettings }: 
       ))}
     </group>
   )
+}
+
+// Main component that doesn't use any Three.js hooks directly
+export default function IFSVisualization(props: IFSVisualizationProps) {
+  return <Scene {...props} />;
 }

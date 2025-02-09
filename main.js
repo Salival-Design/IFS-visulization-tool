@@ -7,9 +7,10 @@ function createWindow() {
     width: 1200,
     height: 800,
     webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
-      webSecurity: true
+      nodeIntegration: false,
+      contextIsolation: true,
+      webSecurity: true,
+      preload: path.join(__dirname, 'preload.js')
     }
   })
 
@@ -19,7 +20,29 @@ function createWindow() {
       responseHeaders: {
         ...details.responseHeaders,
         'Content-Security-Policy': [
-          "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https:; connect-src 'self' https: data: blob:; img-src 'self' https: data: blob:;"
+          isDev
+            ? [
+                "default-src 'self'",
+                "script-src 'self' 'unsafe-inline'",
+                "style-src 'self' 'unsafe-inline'",
+                "img-src 'self' data: blob: https:",
+                "font-src 'self'",
+                "connect-src 'self' ws://localhost:* http://localhost:*",
+                "worker-src 'self' blob:",
+                "base-uri 'self'",
+                "form-action 'self'"
+              ].join('; ')
+            : [
+                "default-src 'self'",
+                "script-src 'self'",
+                "style-src 'self' 'unsafe-inline'",
+                "img-src 'self' data: blob: https:",
+                "font-src 'self'",
+                "connect-src 'self'",
+                "worker-src 'self' blob:",
+                "base-uri 'self'",
+                "form-action 'self'"
+              ].join('; ')
         ]
       }
     })
@@ -27,17 +50,40 @@ function createWindow() {
 
   // Load the app
   if (isDev) {
-    mainWindow.loadURL('http://localhost:5174') // Using Vite's dev server
-  } else {
-    mainWindow.loadFile(path.join(__dirname, 'dist', 'index.html'))
-  }
-
-  // Open DevTools in development
-  if (isDev) {
+    mainWindow.loadURL('http://localhost:5174')
     mainWindow.webContents.openDevTools()
+  } else {
+    // In production, try multiple possible paths
+    const possiblePaths = [
+      path.join(__dirname, 'dist', 'index.html'),
+      path.join(__dirname, '..', 'dist', 'index.html'),
+      path.join(process.cwd(), 'dist', 'index.html')
+    ]
+
+    console.log('Trying to load from these paths:')
+    possiblePaths.forEach(p => console.log('- ' + p))
+
+    // Try each path until one works
+    const loadPath = possiblePaths.find(p => {
+      try {
+        return require('fs').existsSync(p)
+      } catch (e) {
+        return false
+      }
+    })
+
+    if (loadPath) {
+      console.log('Loading from:', loadPath)
+      mainWindow.loadFile(loadPath).catch(err => {
+        console.error('Failed to load index.html:', err)
+        app.quit()
+      })
+    } else {
+      console.error('Could not find index.html in any of the possible paths')
+      app.quit()
+    }
   }
 
-  // Handle window closed
   mainWindow.on('closed', () => {
     mainWindow = null
   })
