@@ -26,6 +26,8 @@ declare global {
         metalness?: number;
         transparent?: boolean;
         opacity?: number;
+        map?: THREE.Texture;
+        emissiveMap?: THREE.Texture;
       };
       pointsMaterial: ReactThreeFiber.MaterialNode<THREE.PointsMaterial, typeof THREE.PointsMaterial> & {
         size?: number;

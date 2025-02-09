@@ -10,6 +10,7 @@ This project aims to develop a feature-rich Electron application for visualizing
     *   Procedurally generated 3D systems using WebGL/Three.js.
     *   Dynamic representation of "Self" as a radiant nucleus.
     *   Interactive particle systems for protector parts (managers/firefighters) and exiled parts.
+    *   Custom image textures for personalized part representation.
     *   Visualization of part relationships, conflicts, and emotional load through:
         *   Depth-aware node hierarchies.
         *   Real-time particle density and color gradients.
@@ -23,16 +24,18 @@ This project aims to develop a feature-rich Electron application for visualizing
         *   Emotional valence heatmaps.
         *   Alliance strength indicators.
     *   Guided IFS protocol integration (direct access vs. witness mode).
-    *   Professional Control Panel:
-        *   Real-time visualization settings adjustment.
-        *   Part management and positioning.
-        *   Dynamic emotional load control.
-        *   Visual effects customization.
-        *   Camera and environment controls.
+    *   Professional Clinical Control Panel:
+        *   Session management and tracking.
+        *   Part creation and customization.
+        *   Custom image upload support.
+        *   Relationship mapping.
+        *   Clinical annotations.
+        *   Progress tracking.
 
 3.  **Dynamic Symbolism Toolkit:**
     *   Customizable visual representations:
         *   Part size and appearance.
+        *   Custom image textures.
         *   Emotional load visualization.
         *   Relationship indicators.
         *   Environmental effects.
@@ -51,15 +54,27 @@ This project aims to develop a feature-rich Electron application for visualizing
 *   **Zustand:** For state management.
 
 ## Current Status
-* Initial project setup complete.
-* Basic 3D visualization implemented.
-* Core IFS model structure defined.
-* Professional control panel implemented.
-* Real-time visualization settings management added.
 
-## Next Steps
-*   Implement relationship visualization between parts.
-*   Add session recording and playback features.
-*   Develop guided protocol integration.
-*   Enhance visual effects and transitions.
-*   Add data persistence and session management.
+### Completed Features
+* Initial project setup complete
+* Basic 3D visualization implemented
+* Core IFS model structure defined
+* Professional clinical panel implemented
+* Part management system with custom images
+* Real-time visualization settings management
+* Session tracking and management
+* Relationship visualization between parts
+* Clinical annotation system
+
+### In Progress
+* Enhanced relationship visualization
+* Session recording and playback
+* Guided protocol integration
+* Data persistence and session management
+
+### Planned Features
+* Client profile management
+* Session history tracking
+* Export and reporting tools
+* Advanced visualization effects
+* Collaborative session support

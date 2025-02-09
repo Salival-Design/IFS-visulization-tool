@@ -9,6 +9,8 @@ A feature-rich Electron application for visualizing the Internal Family Systems 
   - Dynamic Self nucleus visualization
   - Real-time part interaction and movement
   - Orbital camera controls for immersive exploration
+  - Custom image textures for parts
+  - Dynamic relationship lines between parts
 
 - **Professional Control Panel**
   - Real-time visualization settings adjustment
@@ -16,12 +18,23 @@ A feature-rich Electron application for visualizing the Internal Family Systems 
   - Dynamic emotional load control
   - Visual effects customization
   - Camera and environment controls
+  - Custom image upload support
+
+- **Clinical Controls**
+  - Session tracking and management
+  - Client information management
+  - Part creation and customization
+  - Relationship mapping
+  - Clinical annotations
+  - Progress tracking
 
 - **Therapeutic Tools**
   - Part type differentiation (managers, firefighters, exiles)
   - Emotional load visualization
   - Interactive part relationships
   - Session state management
+  - Custom part imagery support
+  - Clinical note-taking
 
 ## Tech Stack
 
@@ -78,17 +91,18 @@ npm run package
 
 ## Usage
 
-### Control Panel
+### Clinical Controls Panel
 
-The application features a professional control panel that allows therapists to:
+The application features a professional clinical control panel that allows therapists to:
 
-- Adjust visualization settings in real-time
-- Manage and position parts
-- Control emotional load values
-- Customize visual effects
-- Adjust camera and environment settings
+- Manage session information
+- Create and customize parts
+- Add custom images to parts
+- Track therapeutic progress
+- Create and manage relationships
+- Add clinical annotations
 
-The control panel can be toggled using the arrow button on the left side.
+The clinical panel can be toggled using the arrow button on the left side.
 
 ### Visualization Controls
 
@@ -100,7 +114,15 @@ The control panel can be toggled using the arrow button on the left side.
 - **Part Interaction**
   - Hover: View part details
   - Click: Select part for editing
-  - Drag: Reposition part (coming soon)
+  - Custom Images: Add personalized imagery to parts
+
+### Part Management
+
+- Create new parts with custom names and types
+- Assign emotional load values
+- Add custom images to parts
+- Define relationships between parts
+- Track therapeutic progress
 
 ## Development
 
@@ -116,13 +138,14 @@ The project uses:
 ```
 src/
   ├── components/
-  │   ├── ControlPanel.tsx    # Professional control panel
-  │   ├── IFSVisualization.tsx # Main 3D visualization
-  │   └── ErrorBoundary.tsx   # Error handling
+  │   ├── CliniciansControlPanel.tsx  # Clinical controls and part management
+  │   ├── ControlPanel.tsx            # Visualization settings
+  │   ├── IFSVisualization.tsx        # Main 3D visualization
+  │   └── ErrorBoundary.tsx           # Error handling
   ├── lib/
-  │   └── ifs-model.ts        # IFS data models
-  ├── App.tsx                 # Main application
-  └── main.tsx               # Entry point
+  │   └── ifs-model.ts                # IFS data models
+  ├── App.tsx                         # Main application
+  └── main.tsx                        # Entry point
 ```
 
 ## License
