@@ -90,7 +90,9 @@ const defaultParts = [
     position: { x: 2, y: 1, z: 0 },
     emotionalLoad: 0.7,
     showLabels: true,
-    brightness: 0.5
+    brightness: 0.5,
+    relationships: [],
+    notes: ''
   },
   {
     id: 'manager_2',
@@ -99,7 +101,9 @@ const defaultParts = [
     position: { x: -2, y: 1, z: 0 },
     emotionalLoad: 0.6,
     showLabels: true,
-    brightness: 0.5
+    brightness: 0.5,
+    relationships: [],
+    notes: ''
   },
   {
     id: 'firefighter_1',
@@ -108,7 +112,9 @@ const defaultParts = [
     position: { x: 0, y: 2, z: 1 },
     emotionalLoad: 0.8,
     showLabels: true,
-    brightness: 0.5
+    brightness: 0.5,
+    relationships: [],
+    notes: ''
   },
   {
     id: 'exile_1',
@@ -117,7 +123,9 @@ const defaultParts = [
     position: { x: 0, y: -2, z: 0 },
     emotionalLoad: 0.5,
     showLabels: true,
-    brightness: 0.5
+    brightness: 0.5,
+    relationships: [],
+    notes: ''
   }
 ];
 
@@ -127,7 +135,10 @@ function App() {
     self: {
       presence: 0.8,
       position: { x: 0, y: 0, z: 0 }
-    }
+    },
+    selfEnergy: 0.8,
+    systemHarmony: 0.7,
+    notes: []
   });
 
   const [visualSettings, setVisualSettings] = useState<VisualizationSettings>({
