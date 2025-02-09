@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { IFSModel, SessionSnapshot, SessionTimeline, TimelineControls } from '@/types/IFSModel';
 import { ClinicalSettings } from './ClinicalPanel';
-import { saveSession, loadSession, getSessions, deleteSession, exportSession, importSession } from '../../utils/sessionStorage';
+import { saveSession, loadSession, getSessions, deleteSession, exportSession, importSession } from '@/utils/sessionStorage';
 
 interface TimelinePanelProps {
   model: IFSModel;
