@@ -1,14 +1,27 @@
 export interface Part {
   id: string;
   name: string;
-  type: 'protector' | 'exile'; // Initially, only two types
-  emotionalLoad: number; // Value between 0 and 1
+  type: 'manager' | 'firefighter' | 'exile';
+  emotionalLoad: number;
+  position: {
+    x: number;
+    y: number;
+    z: number;
+  };
   relationships: {
     targetId: string;
-    type: 'polarized' | 'allied' | 'neutral'; // Relationship types
+    type: 'polarized' | 'allied' | 'protective';
   }[];
 }
 
 export interface IFSModel {
-    parts: Part[];
+  self: {
+    presence: number;
+    position: {
+      x: number;
+      y: number;
+      z: number;
+    };
+  };
+  parts: Part[];
 }

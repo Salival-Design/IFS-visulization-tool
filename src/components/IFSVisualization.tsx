@@ -1,86 +1,176 @@
 import { useFrame } from '@react-three/fiber'
-import { useMemo, useRef } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { IFSModel } from '../lib/ifs-model'
 import { Points, Mesh } from 'three'
+import { useSpring, animated } from '@react-spring/three'
+import { Html, Sparkles } from '@react-three/drei'
 
 interface IFSVisualizationProps {
   model: IFSModel;
 }
 
-const CORE_RADIUS = 0.5
+const CORE_RADIUS = 0.8
+const PARTICLE_COUNT = 1000 // Background particles
+const PART_SCALE = 0.3
+
+// Color schemes for different part types
+const partColors = {
+  manager: '#4a90e2',    // Calming blue
+  firefighter: '#e25c45', // Energetic red
+  exile: '#9b59b6',      // Deep purple
+}
+
+const PartParticle = ({ part, onClick }: { part: any, onClick: () => void }) => {
+  const [hovered, setHovered] = useState(false)
+  const meshRef = useRef<THREE.Mesh>(null)
+
+  // Animate on hover
+  const { scale } = useSpring({
+    scale: hovered ? 1.2 : 1,
+    config: { tension: 300, friction: 10 }
+  })
+
+  useFrame((state) => {
+    if (!meshRef.current) return
+    // Gentle floating motion
+    meshRef.current.position.y += Math.sin(state.clock.elapsedTime + part.id.length) * 0.0005
+  })
+
+  return (
+    <animated.mesh
+      ref={meshRef}
+      position={[part.position.x * 2, part.position.y * 2, part.position.z * 2]}
+      scale={scale}
+      onClick={onClick}
+      onPointerOver={() => setHovered(true)}
+      onPointerOut={() => setHovered(false)}
+    >
+      <sphereGeometry args={[PART_SCALE, 32, 32]} />
+      <meshPhysicalMaterial
+        color={partColors[part.type as keyof typeof partColors]}
+        roughness={0.2}
+        metalness={0.8}
+        transparent
+        opacity={0.8}
+        emissive={partColors[part.type as keyof typeof partColors]}
+        emissiveIntensity={hovered ? 0.5 : 0.2}
+      />
+      {hovered && (
+        <Html distanceFactor={15}>
+          <div className="part-label" style={{
+            background: 'rgba(0,0,0,0.8)',
+            padding: '8px 12px',
+            borderRadius: '4px',
+            color: 'white',
+            fontSize: '14px',
+            whiteSpace: 'nowrap'
+          }}>
+            <strong>{part.name}</strong>
+            <br />
+            Load: {(part.emotionalLoad * 100).toFixed(0)}%
+          </div>
+        </Html>
+      )}
+      <Sparkles
+        count={20}
+        scale={0.4}
+        size={2}
+        speed={0.2}
+        opacity={0.3}
+        color={partColors[part.type as keyof typeof partColors]}
+      />
+    </animated.mesh>
+  )
+}
 
 export default function IFSVisualization({ model }: IFSVisualizationProps) {
   const particles = useRef<Points>(null)
+  const selfRef = useRef<Mesh>(null)
+  const [selectedPart, setSelectedPart] = useState<string | null>(null)
 
+  // Background particle system
   const positions = useMemo(() => {
-    const numParticles = model.parts.length;
-    const arr = new Float32Array(numParticles * 3)
-    for (let i = 0; i < numParticles; i++) {
-      const part = model.parts[i];
-
-      // Initial positions - spread out a bit
-      const pos = new THREE.Vector3()
-      pos.randomDirection().multiplyScalar(CORE_RADIUS * (1.5 + Math.random())) // Further out than core
-      arr.set([pos.x, pos.y, pos.z], i * 3)
+    const arr = new Float32Array(PARTICLE_COUNT * 3)
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      const radius = 5 + Math.random() * 5
+      const theta = Math.random() * Math.PI * 2
+      const phi = Math.random() * Math.PI
+      arr[i * 3] = radius * Math.sin(phi) * Math.cos(theta)
+      arr[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta)
+      arr[i * 3 + 2] = radius * Math.cos(phi)
     }
-    console.log('Particle system initialized', model)
     return arr
-  }, [model])
+  }, [])
 
   useFrame((state) => {
-    if (!particles.current) return;
+    if (!selfRef.current || !particles.current) return
 
-    particles.current.geometry.attributes.position.needsUpdate = true
-    const positions = particles.current.geometry.attributes.position.array
-    const numParticles = model.parts.length;
-
-    // Animate particle system based on IFS Model
-    for (let i = 0; i < numParticles; i++) {
-      const i3 = i * 3;
-      const part = model.parts[i];
-
-      // Calculate distance from the core
-      const dist = Math.sqrt(positions[i3]**2 + positions[i3+1]**2 + positions[i3+2]**2);
-
-      // Basic attraction to the core
-      let attraction = Math.max(0, CORE_RADIUS - dist) * 0.01;
-
-      // Adjust attraction based on emotional load
-      attraction -= part.emotionalLoad * 0.02; // Higher emotional load, further away
-
-      // Apply attraction and random movement
-      positions[i3] += (positions[i3] * -attraction) + (Math.random() - 0.5) * 0.01;
-      positions[i3+1] += (positions[i3+1] * -attraction) + (Math.random() - 0.5) * 0.01;
-      positions[i3+2] += (positions[i3+2] * -attraction) + (Math.random() - 0.5) * 0.01;
+    // Rotate self nucleus gently
+    selfRef.current.rotation.y += 0.001
+    
+    // Animate background particles
+    const positions = particles.current.geometry.attributes.position.array as Float32Array
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      const i3 = i * 3
+      positions[i3] += Math.sin(state.clock.elapsedTime * 0.1 + i) * 0.001
+      positions[i3 + 1] += Math.cos(state.clock.elapsedTime * 0.1 + i) * 0.001
+      positions[i3 + 2] += Math.sin(state.clock.elapsedTime * 0.1 + i) * 0.001
     }
+    particles.current.geometry.attributes.position.needsUpdate = true
   })
 
   return (
     <group>
-      {/* Core Self Nucleus */}
-      <mesh position={[0, 0, 0]}>
-        <sphereGeometry args={[CORE_RADIUS, 32, 32]} />
-        <meshStandardMaterial color="#ffd700" emissive="#ffaa00" />
-      </mesh>
-
-      {/* Particle System */}
+      {/* Background particle system */}
       <points ref={particles}>
         <bufferGeometry>
           <bufferAttribute
             attach="attributes-position"
-            count={model.parts.length}
+            count={PARTICLE_COUNT}
             itemSize={3}
             array={positions}
           />
         </bufferGeometry>
         <pointsMaterial
-          size={0.05}
-          color="#00aaff" // TODO: Color based on part type
+          size={0.02}
+          color="#ffffff"
           transparent
-          opacity={0.8}
+          opacity={0.3}
+          sizeAttenuation
         />
       </points>
+
+      {/* Core Self Nucleus */}
+      <mesh ref={selfRef} position={[0, 0, 0]}>
+        <sphereGeometry args={[CORE_RADIUS, 64, 64]} />
+        <meshPhysicalMaterial
+          color="#ffd700"
+          emissive="#ffaa00"
+          emissiveIntensity={0.5}
+          roughness={0.2}
+          metalness={0.8}
+          transparent
+          opacity={0.9}
+        />
+        <Sparkles
+          count={30}
+          scale={1}
+          size={4}
+          speed={0.2}
+          opacity={0.5}
+          color="#ffaa00"
+        />
+      </mesh>
+
+      {/* Part Visualization */}
+      {model.parts.map((part) => (
+        <PartParticle
+          key={part.id}
+          part={part}
+          onClick={() => setSelectedPart(part.id)}
+        />
+      ))}
     </group>
   )
 }

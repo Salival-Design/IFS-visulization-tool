@@ -4,8 +4,13 @@ import { ReactThreeFiber } from '@react-three/fiber'
 declare global {
   namespace JSX {
     interface IntrinsicElements {
-      ambientLight: ReactThreeFiber.Object3DNode<THREE.AmbientLight, typeof THREE.AmbientLight>;
-      pointLight: ReactThreeFiber.Object3DNode<THREE.PointLight, typeof THREE.PointLight>;
+      ambientLight: ReactThreeFiber.Object3DNode<THREE.AmbientLight, typeof THREE.AmbientLight> & {
+        intensity?: number;
+      };
+      pointLight: ReactThreeFiber.Object3DNode<THREE.PointLight, typeof THREE.PointLight> & {
+        intensity?: number;
+        position?: [number, number, number];
+      };
       group: ReactThreeFiber.Object3DNode<THREE.Group, typeof THREE.Group>;
       mesh: ReactThreeFiber.Object3DNode<THREE.Mesh, typeof THREE.Mesh>;
       points: ReactThreeFiber.Object3DNode<THREE.Points, typeof THREE.Points>;
@@ -13,7 +18,22 @@ declare global {
       bufferGeometry: ReactThreeFiber.BufferGeometryNode<THREE.BufferGeometry, typeof THREE.BufferGeometry>;
       bufferAttribute: ReactThreeFiber.BufferAttributeNode<THREE.BufferAttribute, typeof THREE.BufferAttribute>;
       meshStandardMaterial: ReactThreeFiber.MaterialNode<THREE.MeshStandardMaterial, typeof THREE.MeshStandardMaterial>;
-      pointsMaterial: ReactThreeFiber.MaterialNode<THREE.PointsMaterial, typeof THREE.PointsMaterial>;
+      meshPhysicalMaterial: ReactThreeFiber.MaterialNode<THREE.MeshPhysicalMaterial, typeof THREE.MeshPhysicalMaterial> & {
+        color?: string;
+        emissive?: string;
+        emissiveIntensity?: number;
+        roughness?: number;
+        metalness?: number;
+        transparent?: boolean;
+        opacity?: number;
+      };
+      pointsMaterial: ReactThreeFiber.MaterialNode<THREE.PointsMaterial, typeof THREE.PointsMaterial> & {
+        size?: number;
+        color?: string;
+        transparent?: boolean;
+        opacity?: number;
+        sizeAttenuation?: boolean;
+      };
     }
   }
 }
