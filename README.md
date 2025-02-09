@@ -1,6 +1,6 @@
 # IFS Visualization Suite
 
-A feature-rich Electron application for visualizing the Internal Family Systems (IFS) therapeutic model in an immersive 3D environment.
+A feature-rich Electron application for visualizing the Internal Family Systems (IFS) therapeutic model in an immersive 3D environment. Developed by The Mood & Mind Centre.
 
 ## Features
 
@@ -78,7 +78,7 @@ A feature-rich Electron application for visualizing the Internal Family Systems 
 
 1. Clone the repository:
 ```bash
-git clone [repository-url]
+git clone https://github.com/Salival-Design/IFS-visulization-tool.git
 cd ifs-visualization-suite
 ```
 
@@ -135,14 +135,6 @@ The clinical panel can be toggled using the arrow button on the left side.
   - Zoom Limits: Configurable min/max distances
   - Drag Lock: Automatically disables rotation while dragging parts
 
-- **Part Interaction**
-  - Hover: View part details
-  - Click: Select part for editing
-  - Custom Images: Add personalized imagery to parts
-  - Emotional Load: Adjust part intensity
-  - Position: Fine-tune 3D positioning
-  - Brightness: Control image brightness
-
 ### Timeline Controls
 - Create snapshots of the current state
 - Play/pause timeline playback
@@ -150,43 +142,10 @@ The clinical panel can be toggled using the arrow button on the left side.
 - Loop playback option
 - Minimize timeline panel
 
-### Part Management
-
-- Create new parts with custom names and types
-- Assign emotional load values
-- Add custom images or use default colors
-- Define relationships between parts
-- Track therapeutic progress
-- Set visibility preferences
-- Adjust positioning in 3D space
-
-## Development
-
-The project uses:
-- TypeScript for type safety
-- React for UI components
-- Three.js for 3D visualization
-- Electron for desktop application functionality
-- Vite for fast development and building
-- Modern security practices including CSP
-
-### Project Structure
-
-```
-src/
-  ├── components/
-  │   ├── CliniciansControlPanel.tsx  # Clinical controls and part management
-  │   ├── ControlPanel.tsx            # Visualization settings
-  │   ├── IFSVisualization.tsx        # Main 3D visualization
-  │   └── ErrorBoundary.tsx           # Error handling
-  ├── lib/
-  │   └── ifs-model.ts                # IFS data models
-  ├── types/
-  │   └── IFSModel.ts                 # TypeScript definitions
-  ├── App.tsx                         # Main application
-  └── main.tsx                        # Entry point
-```
-
 ## License
 
-[MIT License](LICENSE) 
+© 2024 The Mood & Mind Centre. All rights reserved.
+
+## Contact
+
+For any inquiries, please contact The Mood & Mind Centre. 
