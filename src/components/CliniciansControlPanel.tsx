@@ -940,6 +940,44 @@ const CliniciansControlPanel: React.FC<CliniciansControlPanelProps> = ({
           scrollbarColor: 'rgba(255,255,255,0.3) rgba(0,0,0,0.2)'
         }}
       >
+        {/* Company Logo and Name */}
+        <div style={{ 
+          padding: '16px 20px',
+          borderBottom: '1px solid rgba(255,255,255,0.1)',
+          backgroundColor: 'rgba(20, 20, 30, 0.98)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px'
+        }}>
+          <div style={{
+            width: '32px',
+            height: '32px',
+            backgroundColor: '#fff',
+            borderRadius: '4px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0
+          }}>
+            <div style={{
+              width: '24px',
+              height: '24px',
+              backgroundImage: 'url(/logo.png)',
+              backgroundSize: 'contain',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat'
+            }} />
+          </div>
+          <div style={{
+            color: 'white',
+            fontSize: '18px',
+            fontWeight: 'bold',
+            letterSpacing: '0.5px'
+          }}>
+            The Mood & Mind Centre
+          </div>
+        </div>
+
         <div style={{ 
           position: 'sticky',
           top: 0,

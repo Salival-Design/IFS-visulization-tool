@@ -232,6 +232,21 @@ function App() {
         }}>
           <strong>Controls:</strong> Left Click = Select Parts | Right Click + Drag = Rotate | Scroll = Zoom
         </div>
+
+        {/* Copyright Notice */}
+        <div style={{
+          position: 'absolute',
+          bottom: '20px',
+          left: '440px',
+          color: 'rgba(255, 255, 255, 0.7)',
+          fontSize: '12px',
+          padding: '8px 12px',
+          backgroundColor: 'rgba(0, 0, 0, 0.6)',
+          borderRadius: '4px',
+          zIndex: 1000
+        }}>
+          © {new Date().getFullYear()} The Mood & Mind Centre. All rights reserved.
+        </div>
       </div>
     </ErrorBoundary>
   );
