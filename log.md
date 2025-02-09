@@ -97,6 +97,43 @@
     * Updated technical specifications
     * Improved setup instructions
 
+## 2024-02-10 - Camera Controls and UI Improvements
+
+*   **Camera Control Enhancements:**
+    * Added rotation lock functionality
+    * Implemented automatic rotation disable during part dragging
+    * Improved camera control responsiveness
+    * Enhanced zoom and orbit controls
+    * Fixed camera control conflicts
+
+*   **Timeline Panel Improvements:**
+    * Added panel minimization feature
+    * Enhanced snapshot management
+    * Improved playback controls
+    * Added smooth transitions
+    * Fixed panel positioning
+
+*   **Part Visualization Enhancements:**
+    * Fixed brightness control direction
+    * Improved image rendering
+    * Enhanced material properties
+    * Added proper brightness scaling
+    * Fixed texture loading issues
+
+*   **Technical Improvements:**
+    * Implemented DraggingContext for better state management
+    * Enhanced orbit controls integration
+    * Improved type definitions
+    * Fixed component rerendering issues
+    * Enhanced error handling
+
+*   **Documentation:**
+    * Updated README with new features
+    * Enhanced camera controls documentation
+    * Added timeline panel documentation
+    * Updated technical specifications
+    * Improved setup instructions
+
 ## 2025-02-07
 
 *   **Task Received:** Design a feature-rich Electron application for creating an immersive 3D visualization tool based on the Internal Family Systems (IFS) therapeutic model.

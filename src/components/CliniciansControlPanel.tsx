@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { IFSModel } from '../lib/ifs-model';
-import { partColors } from '../types/IFSModel';
+import { IFSModel, Part, partColors } from '../types/IFSModel';
 
 export interface ClinicalSettings {
   // Session Information
@@ -168,7 +167,8 @@ const PartsTab: React.FC<{
     type: 'manager' as const,
     emotionalLoad: 0.5,
     imageUrl: '',
-    showLabels: true
+    showLabels: true,
+    brightness: 0.5
   });
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>, isNewPart: boolean, partId?: string) => {
@@ -178,10 +178,10 @@ const PartsTab: React.FC<{
       reader.onloadend = () => {
         const base64String = reader.result as string;
         if (isNewPart) {
-          setNewPart({ ...newPart, imageUrl: base64String });
+          setNewPart(prev => ({ ...prev, imageUrl: base64String }));
         } else if (partId) {
           const updatedParts = model.parts.map(p =>
-            p.id === partId ? { ...p, imageUrl: base64String || '' } : p
+            p.id === partId ? { ...p, imageUrl: base64String } : p
           );
           onUpdateModel({ ...model, parts: updatedParts });
         }
@@ -205,7 +205,8 @@ const PartsTab: React.FC<{
       },
       relationships: [],
       imageUrl: newPart.imageUrl || '',
-      showLabels: newPart.showLabels
+      showLabels: newPart.showLabels,
+      brightness: newPart.brightness
     };
 
     onUpdateModel({
@@ -218,10 +219,42 @@ const PartsTab: React.FC<{
       type: 'manager',
       emotionalLoad: 0.5,
       imageUrl: '',
-      showLabels: true
+      showLabels: true,
+      brightness: 0.5
     });
     setShowNewPartForm(false);
   };
+
+  const renderPartImage = (part: Part) => (
+    <div style={{ position: 'relative', width: '50px', height: '50px' }}>
+      {part.imageUrl ? (
+        <img 
+          src={part.imageUrl} 
+          alt={part.name}
+          style={{
+            width: '100%',
+            height: '100%',
+            borderRadius: '6px',
+            objectFit: 'cover'
+          }}
+        />
+      ) : (
+        <div style={{
+          width: '100%',
+          height: '100%',
+          borderRadius: '6px',
+          backgroundColor: partColors[part.type],
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '20px',
+          color: 'white'
+        }}>
+          {part.name[0]}
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <div className="tab-content" style={{ display: 'grid', gap: '15px' }}>
@@ -407,34 +440,7 @@ const PartsTab: React.FC<{
             backgroundColor: 'rgba(0,0,0,0.2)',
             borderRadius: '6px'
           }}>
-            <div style={{ position: 'relative', width: '50px', height: '50px' }}>
-              {part.imageUrl ? (
-                <img 
-                  src={part.imageUrl} 
-                  alt={part.name}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    borderRadius: '6px',
-                    objectFit: 'cover'
-                  }}
-                />
-              ) : (
-                <div style={{
-                  width: '100%',
-                  height: '100%',
-                  borderRadius: '6px',
-                  backgroundColor: partColors[part.type],
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '20px',
-                  color: 'white'
-                }}>
-                  {part.name[0]}
-                </div>
-              )}
-            </div>
+            {renderPartImage(part)}
             <div style={{ flex: 1 }}>
               <h4 style={{ margin: '0 0 5px 0', fontSize: '16px' }}>{part.name}</h4>
               <span style={{ 
@@ -474,28 +480,28 @@ const PartsTab: React.FC<{
                     fontSize: '14px'
                   }}
                 >
-                  Upload Image
+                  {part.imageUrl ? 'Change Image' : 'Upload Image'}
                 </label>
-                <input
-                  type="text"
-                  placeholder="or paste image URL"
-                  value={part.imageUrl || ''}
-                  onChange={(e) => {
-                    const updatedParts = model.parts.map(p =>
-                      p.id === part.id ? { ...p, imageUrl: e.target.value } : p
-                    );
-                    onUpdateModel({ ...model, parts: updatedParts });
-                  }}
-                  style={{
-                    flex: 2,
-                    padding: '8px',
-                    backgroundColor: 'rgba(255,255,255,0.1)',
-                    border: 'none',
-                    borderRadius: '4px',
-                    color: 'white',
-                    fontSize: '14px'
-                  }}
-                />
+                {part.imageUrl && (
+                  <button
+                    onClick={() => {
+                      const updatedParts = model.parts.map(p =>
+                        p.id === part.id ? { ...p, imageUrl: undefined } : p
+                      );
+                      onUpdateModel({ ...model, parts: updatedParts });
+                    }}
+                    style={{
+                      padding: '8px 16px',
+                      backgroundColor: 'rgba(255,0,0,0.2)',
+                      border: '1px solid rgba(255,0,0,0.3)',
+                      borderRadius: '4px',
+                      color: 'white',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Remove Image
+                  </button>
+                )}
               </div>
             </div>
 
@@ -538,6 +544,34 @@ const PartsTab: React.FC<{
               />
               <label htmlFor={`show-labels-${part.id}`}>Show Labels</label>
             </div>
+
+            {/* Add brightness control after the image upload section */}
+            {part.imageUrl && (
+              <div>
+                <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px' }}>
+                  Image Brightness
+                </label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.1"
+                    value={part.brightness}
+                    onChange={(e) => {
+                      const updatedParts = model.parts.map(p =>
+                        p.id === part.id ? { ...p, brightness: parseFloat(e.target.value) } : p
+                      );
+                      onUpdateModel({ ...model, parts: updatedParts });
+                    }}
+                    style={{ flex: 1 }}
+                  />
+                  <span style={{ minWidth: '45px', textAlign: 'right' }}>
+                    {(part.brightness * 100).toFixed(0)}%
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       ))}

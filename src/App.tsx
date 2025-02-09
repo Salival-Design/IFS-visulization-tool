@@ -1,19 +1,33 @@
-import { Canvas } from '@react-three/fiber'
-import { OrbitControls } from '@react-three/drei'
-import ErrorBoundary from './ErrorBoundary'
-import IFSVisualization from './components/IFSVisualization'
-import ControlPanel, { VisualizationSettings } from './components/ControlPanel'
-import CliniciansControlPanel, { ClinicalSettings } from './components/CliniciansControlPanel'
-import { IFSModel } from './lib/ifs-model'
-import { Suspense, useState } from 'react'
+import React, { useState, useCallback, useRef, createContext } from 'react';
+import { Canvas } from '@react-three/fiber';
+import { OrbitControls, Html } from '@react-three/drei';
+import ErrorBoundary from './ErrorBoundary';
+import IFSVisualization from './components/IFSVisualization';
+import ControlPanel, { VisualizationSettings } from './components/ControlPanel';
+import CliniciansControlPanel, { ClinicalSettings } from './components/CliniciansControlPanel';
+import TimelinePanel from './components/TimelinePanel';
+import { IFSModel } from './types/IFSModel';
+import { Suspense } from 'react';
 
-const Scene = ({ model, settings, clinicalSettings }: { 
+export const DraggingContext = createContext<{
+  isDragging: boolean;
+  setIsDragging: (dragging: boolean) => void;
+}>({
+  isDragging: false,
+  setIsDragging: () => {},
+});
+
+const Scene = ({ model, settings, clinicalSettings, onUpdateModel }: { 
   model: IFSModel; 
   settings: VisualizationSettings;
   clinicalSettings: ClinicalSettings;
+  onUpdateModel: (updatedModel: IFSModel) => void;
 }) => {
+  const [isDragging, setIsDragging] = useState(false);
+  const [isRotationLocked, setIsRotationLocked] = useState(false);
+
   return (
-    <>
+    <DraggingContext.Provider value={{ isDragging, setIsDragging }}>
       {/* Lighting */}
       <ambientLight intensity={0.2} />
       <pointLight position={[10, 10, 10]} intensity={0.5} />
@@ -29,95 +43,136 @@ const Scene = ({ model, settings, clinicalSettings }: {
         model={model}
         settings={settings}
         clinicalSettings={clinicalSettings}
+        onUpdateModel={onUpdateModel}
       />
       
       {/* Controls */}
       <OrbitControls
+        enabled={!isDragging && !isRotationLocked}
         enablePan={false}
         minDistance={4}
         maxDistance={20}
         enableDamping
         dampingFactor={0.05}
       />
-    </>
+
+      {/* Rotation Lock Button */}
+      <Html position={[-5, 3, 0]}>
+        <button
+          onClick={() => setIsRotationLocked(!isRotationLocked)}
+          style={{
+            backgroundColor: isRotationLocked ? 'rgba(255,50,50,0.8)' : 'rgba(50,50,50,0.8)',
+            color: 'white',
+            border: 'none',
+            padding: '8px 16px',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            fontSize: '14px',
+            transition: 'all 0.2s ease'
+          }}
+        >
+          {isRotationLocked ? '🔒' : '🔓'} {isRotationLocked ? 'Unlock' : 'Lock'} Rotation
+        </button>
+      </Html>
+    </DraggingContext.Provider>
   );
 };
 
-const App = () => {
-  // Initial model state
+// Add default parts
+const defaultParts = [
+  {
+    id: 'manager_1',
+    name: 'Perfectionist',
+    type: 'manager' as const,
+    position: { x: 2, y: 1, z: 0 },
+    emotionalLoad: 0.7,
+    showLabels: true,
+    brightness: 0.5
+  },
+  {
+    id: 'manager_2',
+    name: 'Protector',
+    type: 'manager' as const,
+    position: { x: -2, y: 1, z: 0 },
+    emotionalLoad: 0.6,
+    showLabels: true,
+    brightness: 0.5
+  },
+  {
+    id: 'firefighter_1',
+    name: 'Distracter',
+    type: 'firefighter' as const,
+    position: { x: 0, y: 2, z: 1 },
+    emotionalLoad: 0.8,
+    showLabels: true,
+    brightness: 0.5
+  },
+  {
+    id: 'exile_1',
+    name: 'Inner Child',
+    type: 'exile' as const,
+    position: { x: 0, y: -2, z: 0 },
+    emotionalLoad: 0.5,
+    showLabels: true,
+    brightness: 0.5
+  }
+];
+
+function App() {
   const [model, setModel] = useState<IFSModel>({
+    parts: defaultParts,
     self: {
       presence: 0.8,
       position: { x: 0, y: 0, z: 0 }
-    },
-    parts: [
-      {
-        id: 'manager1',
-        name: 'Perfectionist',
-        type: 'manager',
-        emotionalLoad: 0.7,
-        position: { x: 1, y: 1, z: 0 },
-        relationships: [],
-        imageUrl: '',
-        showLabels: true
-      },
-      {
-        id: 'firefighter1',
-        name: 'Distracter',
-        type: 'firefighter',
-        emotionalLoad: 0.8,
-        position: { x: -1, y: 1, z: 0 },
-        relationships: [],
-        imageUrl: '',
-        showLabels: true
-      },
-      {
-        id: 'exile1',
-        name: 'Lonely Child',
-        type: 'exile',
-        emotionalLoad: 0.9,
-        position: { x: 0, y: -1, z: 0 },
-        relationships: [],
-        imageUrl: '',
-        showLabels: true
-      }
-    ]
+    }
   });
 
-  // Initial visualization settings
   const [visualSettings, setVisualSettings] = useState<VisualizationSettings>({
-    cameraDistance: 8,
-    rotationSpeed: 0.001,
+    selfSize: 1,
+    partSize: 0.5,
+    rotationSpeed: 0.01,
     particleDensity: 1000,
-    selfSize: 0.8,
-    partSize: 0.3,
-    backgroundColor: '#0a0a0f',
+    showSparkles: true,
     showLabels: true,
-    showSparkles: true
+    backgroundColor: '#000000'
   });
 
-  // Initial clinical settings
   const [clinicalSettings, setClinicalSettings] = useState<ClinicalSettings>({
     sessionNumber: 1,
     sessionDate: new Date().toISOString().split('T')[0],
     clientName: '',
     therapeuticGoals: [],
     sessionNotes: '',
-    selfEnergyLevel: 0.8,
+    selfEnergyLevel: 0.5,
     unblending: 0.5,
-    systemHarmony: 0.6,
+    systemHarmony: 0.5,
     annotations: [],
     relationships: []
   });
 
+  const handleModelUpdate = useCallback((newModel: IFSModel) => {
+    setModel(newModel);
+  }, []);
+
+  const handleClinicalSettingsUpdate = useCallback((newSettings: ClinicalSettings) => {
+    setClinicalSettings(newSettings);
+  }, []);
+
+  const handleVisualSettingsUpdate = useCallback((newSettings: VisualizationSettings) => {
+    setVisualSettings(newSettings);
+  }, []);
+
   return (
     <ErrorBoundary>
-      <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
+      <div style={{ width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden' }}>
         <Canvas
           style={{
             background: visualSettings.backgroundColor
           }}
-          camera={{ position: [0, 0, visualSettings.cameraDistance], fov: 50 }}
+          camera={{ position: [0, 0, 10], fov: 50 }}
         >
           <ErrorBoundary>
             <Suspense fallback={null}>
@@ -125,6 +180,7 @@ const App = () => {
                 model={model}
                 settings={visualSettings}
                 clinicalSettings={clinicalSettings}
+                onUpdateModel={handleModelUpdate}
               />
             </Suspense>
           </ErrorBoundary>
@@ -143,19 +199,24 @@ const App = () => {
             <CliniciansControlPanel
               model={model}
               clinicalSettings={clinicalSettings}
-              onUpdateModel={setModel}
-              onUpdateSettings={setClinicalSettings}
+              onUpdateModel={handleModelUpdate}
+              onUpdateSettings={handleClinicalSettingsUpdate}
             />
           </div>
           <div style={{ pointerEvents: 'auto' }}>
             <ControlPanel
-              model={model}
-              onUpdateModel={setModel}
-              visualSettings={visualSettings}
-              onUpdateSettings={setVisualSettings}
+              settings={visualSettings}
+              onUpdateSettings={handleVisualSettingsUpdate}
             />
           </div>
         </div>
+
+        <TimelinePanel
+          model={model}
+          clinicalSettings={clinicalSettings}
+          onUpdateModel={handleModelUpdate}
+          onUpdateSettings={handleClinicalSettingsUpdate}
+        />
 
         {/* Help Tooltip */}
         <div style={{
@@ -174,6 +235,6 @@ const App = () => {
       </div>
     </ErrorBoundary>
   );
-};
+}
 
 export default App;

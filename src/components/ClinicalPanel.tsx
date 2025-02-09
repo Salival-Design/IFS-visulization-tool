@@ -32,6 +32,8 @@ export interface ClinicalSettings {
     type: 'polarization' | 'alliance' | 'protection' | 'burden';
     strength: number;              // 0-1: Strength of relationship
     notes: string;
+    color?: string;               // Color of the relationship line
+    isHealthy: boolean;           // Whether the relationship is considered healthy
   }[];
 }
 
@@ -70,7 +72,8 @@ const ClinicalPanel: React.FC<ClinicalPanelProps> = ({
       targetId: model.parts[1]?.id || '',
       type: 'alliance' as const,
       strength: 0.5,
-      notes: ''
+      notes: '',
+      isHealthy: true
     };
     onUpdateSettings({
       ...clinicalSettings,

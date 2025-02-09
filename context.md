@@ -42,7 +42,10 @@ This project aims to develop a feature-rich Electron application for visualizing
     *   Smooth transitions and animations
     *   Intuitive part management
     *   Real-time visual feedback
-    *   Optimized controls
+    *   Optimized controls:
+        * Camera rotation lock
+        * Automatic rotation disable during drag
+        * Minimizable timeline panel
     *   Clear visual hierarchy
     *   Professional styling
     *   Improved tab navigation
@@ -81,6 +84,9 @@ This project aims to develop a feature-rich Electron application for visualizing
 * Security hardening (CSP)
 * Improved relationship effects
 * Enhanced clinical tools
+* Camera control improvements
+* Timeline panel minimization
+* Part brightness control
 
 ### In Progress
 * Data persistence

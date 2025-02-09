@@ -1,35 +1,33 @@
 import React, { useState } from 'react';
 import { IFSModel, Part } from '../lib/ifs-model';
 
+export interface VisualizationSettings {
+  selfSize: number;
+  partSize: number;
+  rotationSpeed: number;
+  particleDensity: number;
+  showSparkles: boolean;
+  showLabels: boolean;
+  backgroundColor: string;
+}
+
 interface ControlPanelProps {
-  model: IFSModel;
-  onUpdateModel: (model: IFSModel) => void;
-  visualSettings: VisualizationSettings;
+  settings: VisualizationSettings;
   onUpdateSettings: (settings: VisualizationSettings) => void;
 }
 
-export interface VisualizationSettings {
-  cameraDistance: number;
-  rotationSpeed: number;
-  particleDensity: number;
-  selfSize: number;
-  partSize: number;
-  backgroundColor: string;
-  showLabels: boolean;
-  showSparkles: boolean;
-}
-
 const ControlPanel: React.FC<ControlPanelProps> = ({
-  model,
-  onUpdateModel,
-  visualSettings,
+  settings,
   onUpdateSettings,
 }) => {
   const [selectedPart, setSelectedPart] = useState<string | null>(null);
   const [isExpanded, setIsExpanded] = useState(true);
 
   const handleSettingChange = (key: keyof VisualizationSettings, value: any) => {
-    onUpdateSettings({ ...visualSettings, [key]: value });
+    onUpdateSettings({
+      ...settings,
+      [key]: value
+    });
   };
 
   return (
@@ -129,23 +127,23 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
             Visual Settings
           </h3>
           <div className="settings-grid" style={{ display: 'grid', gap: '15px' }}>
-            {/* Camera Distance */}
+            {/* Self Size */}
             <div>
               <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px' }}>
-                Camera Distance
+                Self Size
               </label>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <input
                   type="range"
-                  min="4"
-                  max="20"
-                  step="0.5"
-                  value={visualSettings.cameraDistance}
-                  onChange={(e) => handleSettingChange('cameraDistance', parseFloat(e.target.value))}
+                  min="0.5"
+                  max="2"
+                  step="0.1"
+                  value={settings.selfSize}
+                  onChange={(e) => handleSettingChange('selfSize', parseFloat(e.target.value))}
                   style={{ flex: 1 }}
                 />
                 <span style={{ minWidth: '45px', textAlign: 'right' }}>
-                  {visualSettings.cameraDistance.toFixed(1)}
+                  {settings.selfSize.toFixed(1)}
                 </span>
               </div>
             </div>
@@ -158,36 +156,57 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <input
                   type="range"
-                  min="0.1"
-                  max="2"
+                  min="0.2"
+                  max="1"
                   step="0.1"
-                  value={visualSettings.partSize}
+                  value={settings.partSize}
                   onChange={(e) => handleSettingChange('partSize', parseFloat(e.target.value))}
                   style={{ flex: 1 }}
                 />
                 <span style={{ minWidth: '45px', textAlign: 'right' }}>
-                  {visualSettings.partSize.toFixed(1)}
+                  {settings.partSize.toFixed(1)}
                 </span>
               </div>
             </div>
 
-            {/* Self Size */}
+            {/* Rotation Speed */}
             <div>
               <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px' }}>
-                Self Size
+                Rotation Speed
               </label>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <input
                   type="range"
-                  min="0.5"
-                  max="2"
-                  step="0.1"
-                  value={visualSettings.selfSize}
-                  onChange={(e) => handleSettingChange('selfSize', parseFloat(e.target.value))}
+                  min="0"
+                  max="0.05"
+                  step="0.001"
+                  value={settings.rotationSpeed}
+                  onChange={(e) => handleSettingChange('rotationSpeed', parseFloat(e.target.value))}
                   style={{ flex: 1 }}
                 />
                 <span style={{ minWidth: '45px', textAlign: 'right' }}>
-                  {visualSettings.selfSize.toFixed(1)}
+                  {settings.rotationSpeed.toFixed(3)}
+                </span>
+              </div>
+            </div>
+
+            {/* Particle Density */}
+            <div>
+              <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px' }}>
+                Particle Density
+              </label>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <input
+                  type="range"
+                  min="0"
+                  max="2000"
+                  step="100"
+                  value={settings.particleDensity}
+                  onChange={(e) => handleSettingChange('particleDensity', parseInt(e.target.value))}
+                  style={{ flex: 1 }}
+                />
+                <span style={{ minWidth: '45px', textAlign: 'right' }}>
+                  {settings.particleDensity.toLocaleString()}
                 </span>
               </div>
             </div>
@@ -199,7 +218,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
               </label>
               <input
                 type="color"
-                value={visualSettings.backgroundColor}
+                value={settings.backgroundColor}
                 onChange={(e) => handleSettingChange('backgroundColor', e.target.value)}
                 style={{ width: '100%', height: '30px' }}
               />
@@ -210,7 +229,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
               <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
                 <input
                   type="checkbox"
-                  checked={visualSettings.showLabels}
+                  checked={settings.showLabels}
                   onChange={(e) => handleSettingChange('showLabels', e.target.checked)}
                 />
                 <span>🏷️ Show Labels</span>
@@ -219,7 +238,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
               <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
                 <input
                   type="checkbox"
-                  checked={visualSettings.showSparkles}
+                  checked={settings.showSparkles}
                   onChange={(e) => handleSettingChange('showSparkles', e.target.checked)}
                 />
                 <span>✨ Show Sparkles</span>
@@ -241,103 +260,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
             Parts Management
           </h3>
           <div className="parts-list" style={{ display: 'grid', gap: '10px' }}>
-            {model.parts.map((part) => (
-              <div
-                key={part.id}
-                style={{
-                  padding: '15px',
-                  backgroundColor: selectedPart === part.id ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.05)',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                }}
-                onClick={() => setSelectedPart(part.id)}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                  <strong>{part.name}</strong>
-                  <span style={{ 
-                    opacity: 0.7,
-                    fontSize: '12px',
-                    backgroundColor: 'rgba(255,255,255,0.1)',
-                    padding: '2px 8px',
-                    borderRadius: '10px'
-                  }}>{part.type}</span>
-                </div>
-                {selectedPart === part.id && (
-                  <div style={{ marginTop: '10px', display: 'grid', gap: '10px' }}>
-                    <div>
-                      <label style={{ display: 'block', marginBottom: '4px', fontSize: '12px' }}>
-                        Emotional Load
-                      </label>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <input
-                          type="range"
-                          min="0"
-                          max="1"
-                          step="0.1"
-                          value={part.emotionalLoad}
-                          onChange={(e) => {
-                            const updatedParts = model.parts.map(p =>
-                              p.id === part.id ? { ...p, emotionalLoad: parseFloat(e.target.value) } : p
-                            );
-                            onUpdateModel({ ...model, parts: updatedParts });
-                          }}
-                          style={{ flex: 1 }}
-                        />
-                        <span style={{ minWidth: '45px', textAlign: 'right' }}>
-                          {(part.emotionalLoad * 100).toFixed(0)}%
-                        </span>
-                      </div>
-                    </div>
-
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '5px' }}>
-                      <label>
-                        X
-                        <input
-                          type="number"
-                          value={part.position.x}
-                          onChange={(e) => {
-                            const updatedParts = model.parts.map(p =>
-                              p.id === part.id ? { ...p, position: { ...p.position, x: parseFloat(e.target.value) } } : p
-                            );
-                            onUpdateModel({ ...model, parts: updatedParts });
-                          }}
-                          style={{ width: '100%', padding: '4px' }}
-                        />
-                      </label>
-                      <label>
-                        Y
-                        <input
-                          type="number"
-                          value={part.position.y}
-                          onChange={(e) => {
-                            const updatedParts = model.parts.map(p =>
-                              p.id === part.id ? { ...p, position: { ...p.position, y: parseFloat(e.target.value) } } : p
-                            );
-                            onUpdateModel({ ...model, parts: updatedParts });
-                          }}
-                          style={{ width: '100%', padding: '4px' }}
-                        />
-                      </label>
-                      <label>
-                        Z
-                        <input
-                          type="number"
-                          value={part.position.z}
-                          onChange={(e) => {
-                            const updatedParts = model.parts.map(p =>
-                              p.id === part.id ? { ...p, position: { ...p.position, z: parseFloat(e.target.value) } } : p
-                            );
-                            onUpdateModel({ ...model, parts: updatedParts });
-                          }}
-                          style={{ width: '100%', padding: '4px' }}
-                        />
-                      </label>
-                    </div>
-                  </div>
-                )}
-              </div>
-            ))}
+            {/* Parts management content */}
           </div>
         </section>
       </div>

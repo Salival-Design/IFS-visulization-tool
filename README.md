@@ -125,9 +125,15 @@ The clinical panel can be toggled using the arrow button on the left side.
 
 - **Mouse Controls**
   - Left Click: Select parts
-  - Right Click + Drag: Rotate camera
+  - Right Click + Drag: Rotate camera (when unlocked)
   - Scroll: Zoom in/out
   - Mouse Over: View part details
+
+- **Camera Controls**
+  - Rotation Lock: Toggle camera rotation
+  - Orbit Controls: Smooth camera movement
+  - Zoom Limits: Configurable min/max distances
+  - Drag Lock: Automatically disables rotation while dragging parts
 
 - **Part Interaction**
   - Hover: View part details
@@ -135,6 +141,14 @@ The clinical panel can be toggled using the arrow button on the left side.
   - Custom Images: Add personalized imagery to parts
   - Emotional Load: Adjust part intensity
   - Position: Fine-tune 3D positioning
+  - Brightness: Control image brightness
+
+### Timeline Controls
+- Create snapshots of the current state
+- Play/pause timeline playback
+- Adjust playback speed
+- Loop playback option
+- Minimize timeline panel
 
 ### Part Management
 

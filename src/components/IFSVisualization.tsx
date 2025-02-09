@@ -1,19 +1,22 @@
+import React, { useContext } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { useMemo, useRef, useState, useEffect } from 'react'
+import { useMemo, useRef, useState, useEffect, useCallback } from 'react'
 import * as THREE from 'three'
-import { IFSModel, Part } from '../lib/ifs-model'
+import { IFSModel, Part } from '../types/IFSModel'
 import { Points, Mesh } from 'three'
 import { useSpring } from '@react-spring/three'
 import { Html, Sparkles, Line } from '@react-three/drei'
 import { VisualizationSettings } from './ControlPanel'
-import { ClinicalSettings } from './ClinicalPanel'
+import { ClinicalSettings } from './CliniciansControlPanel'
 import { partColors } from '../types/IFSModel'
 import { ThreeEvent } from '@react-three/fiber'
+import { DraggingContext } from '../App'
 
 interface IFSVisualizationProps {
   model: IFSModel;
   settings: VisualizationSettings;
   clinicalSettings: ClinicalSettings;
+  onUpdateModel: (updatedModel: IFSModel) => void;
 }
 
 const CORE_RADIUS = 0.8
@@ -27,10 +30,16 @@ const PartMesh: React.FC<{
   onClick: () => void;
   onPointerOver: () => void;
   onPointerOut: () => void;
-}> = ({ part, settings, isHovered, onClick, onPointerOver, onPointerOut }) => {
+  onDragStart: () => void;
+  onDrag: (position: { x: number; y: number; z: number }) => void;
+  onDragEnd: () => void;
+}> = ({ part, settings, isHovered, onClick, onPointerOver, onPointerOut, onDragStart, onDrag, onDragEnd }) => {
   const [texture, setTexture] = useState<THREE.Texture | null>(null);
   const textureLoader = useMemo(() => new THREE.TextureLoader(), []);
   const materialRef = useRef<THREE.MeshStandardMaterial>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const dragRef = useRef<{ x: number; y: number; z: number } | null>(null);
+  const { setIsDragging: setGlobalDragging } = useContext(DraggingContext);
 
   useEffect(() => {
     if (part.imageUrl) {
@@ -47,6 +56,50 @@ const PartMesh: React.FC<{
     }
   }, [part.imageUrl, textureLoader]);
 
+  const handlePointerDown = (event: ThreeEvent<PointerEvent>) => {
+    event.stopPropagation();
+    setIsDragging(true);
+    setGlobalDragging(true);
+    onDragStart();
+    dragRef.current = {
+      x: event.point.x - part.position.x,
+      y: event.point.y - part.position.y,
+      z: event.point.z - part.position.z
+    };
+  };
+
+  const handlePointerMove = (event: ThreeEvent<PointerEvent>) => {
+    if (isDragging && dragRef.current) {
+      event.stopPropagation();
+      const newPosition = {
+        x: event.point.x - dragRef.current.x,
+        y: event.point.y - dragRef.current.y,
+        z: event.point.z - dragRef.current.z
+      };
+      onDrag(newPosition);
+    }
+  };
+
+  const handlePointerUp = () => {
+    if (isDragging) {
+      setIsDragging(false);
+      setGlobalDragging(false);
+      onDragEnd();
+      dragRef.current = null;
+    }
+  };
+
+  useEffect(() => {
+    if (isDragging) {
+      document.body.style.cursor = 'grabbing';
+    } else {
+      document.body.style.cursor = 'auto';
+    }
+    return () => {
+      document.body.style.cursor = 'auto';
+    };
+  }, [isDragging]);
+
   const scale = settings.partSize * (1 + (part.emotionalLoad * 0.5));
   const hoverScale = isHovered ? 1.2 : 1;
 
@@ -55,12 +108,16 @@ const PartMesh: React.FC<{
       materialRef.current.color = new THREE.Color(texture ? 'white' : partColors[part.type]);
       materialRef.current.map = texture;
       materialRef.current.emissive = new THREE.Color(texture ? 'white' : partColors[part.type]);
-      materialRef.current.emissiveIntensity = isHovered ? 0.5 : 0.2;
+      materialRef.current.emissiveIntensity = texture ? (1 - part.brightness) : (isHovered ? 0.5 : 0.2);
       materialRef.current.transparent = true;
       materialRef.current.opacity = 0.9;
+      if (texture) {
+        materialRef.current.metalness = 0.1;
+        materialRef.current.roughness = 0.2;
+      }
       materialRef.current.needsUpdate = true;
     }
-  }, [texture, part.type, isHovered]);
+  }, [texture, part.type, part.brightness, isHovered]);
 
   return (
     <group
@@ -69,6 +126,10 @@ const PartMesh: React.FC<{
       onClick={onClick}
       onPointerOver={onPointerOver}
       onPointerOut={onPointerOut}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerLeave={handlePointerUp}
     >
       <mesh>
         <sphereGeometry args={[0.5, 32, 32]} />
@@ -180,7 +241,7 @@ const Annotation = ({ text, position, type }: {
 };
 
 // Move all Three.js specific components into a Scene component
-const Scene: React.FC<IFSVisualizationProps> = ({ model, settings, clinicalSettings }) => {
+const Scene: React.FC<IFSVisualizationProps> = ({ model, settings, clinicalSettings, onUpdateModel }) => {
   const particles = useRef<Points>(null)
   const selfRef = useRef<Mesh>(null)
   const [selectedPart, setSelectedPart] = useState<string | null>(null)
@@ -260,6 +321,23 @@ const Scene: React.FC<IFSVisualizationProps> = ({ model, settings, clinicalSetti
       return ann;
     });
   }, [model.parts, clinicalSettings?.annotations]);
+
+  const handlePartDragStart = useCallback(() => {
+    // Optional: Add any drag start logic
+  }, []);
+
+  const handlePartDrag = useCallback((partId: string, newPosition: { x: number; y: number; z: number }) => {
+    onUpdateModel({
+      ...model,
+      parts: model.parts.map(p =>
+        p.id === partId ? { ...p, position: newPosition } : p
+      )
+    });
+  }, [model, onUpdateModel]);
+
+  const handlePartDragEnd = useCallback(() => {
+    // Optional: Add any drag end logic
+  }, []);
 
   useFrame((state) => {
     if (!selfRef.current || !particles.current) return
@@ -348,6 +426,9 @@ const Scene: React.FC<IFSVisualizationProps> = ({ model, settings, clinicalSetti
           onClick={() => setSelectedPart(part.id)}
           onPointerOver={() => setSelectedPart(part.id)}
           onPointerOut={() => setSelectedPart(null)}
+          onDragStart={() => handlePartDragStart()}
+          onDrag={(position) => handlePartDrag(part.id, position)}
+          onDragEnd={() => handlePartDragEnd()}
         />
       ))}
 
