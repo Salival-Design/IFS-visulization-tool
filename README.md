@@ -1,7 +1,6 @@
 # IFS Visualization Suite
 
-A feature-rich Electron application for visualizing the Internal Family Systems (IFS) therapeutic model in an immersive 3D environment. Developed by The Mood & Mind Centre.
-
+A feature-rich Electron application for visualizing the Internal Family Systems (IFS) therapeutic model in an immersive 3D environment. 
 ## Features
 
 - **3D Visualization**
