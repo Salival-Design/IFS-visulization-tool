@@ -70,18 +70,8 @@ A feature-rich Electron application for visualizing the Internal Family Systems 
 
 ### Prerequisites
 
-1. Install Homebrew:
-```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-```
-
-2. Install Node.js and development tools:
-```bash
-brew install node
-xcode-select --install
-brew install git
-brew install --cask visual-studio-code
-```
+- Install GitHub for PC to Clone
+- Install relevant dependencies
 
 ### Project Setup
 
